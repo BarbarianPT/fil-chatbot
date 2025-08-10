@@ -81,13 +81,20 @@
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const updateButton = document.getElementById('update-button');
+        
+        // This array will hold the conversation history
+        const chatHistory = [];
 
         // Current version of the app. This could be fetched from a file in a real-world scenario.
         const currentVersion = '1.0.1';
         let isUpdateAvailable = true; // Simulating that an update is available
 
         // Initial bot message, updated with the correct name
-        appendMessage('bot', `Hello! I'm Fil, an LLM created and modeled by Filipe Leiras. How can I help you today?`);
+        const initialMessage = "Hello! I'm Fil, an LLM created and modeled by Filipe Leiras. How can I help you today?";
+        appendMessage('bot', initialMessage);
+        
+        // Push the initial message to the chat history
+        chatHistory.push({ role: 'model', parts: [{ text: initialMessage }] });
 
         // Add event listeners for sending a message and checking for updates
         sendButton.addEventListener('click', sendMessage);
@@ -119,8 +126,9 @@
             const userText = userInput.value.trim();
             if (userText === '') return;
 
-            // Display user's message
+            // Display user's message and add to history
             appendMessage('user', userText);
+            chatHistory.push({ role: 'user', parts: [{ text: userText }] });
             userInput.value = ''; // Clear the input field
 
             // Display a loading indicator while waiting for the response
@@ -131,14 +139,10 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Prepare the payload for the Gemini API call with a system prompt
-                let chatHistory = [];
-                chatHistory.push({ role: "system", parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }] });
-                chatHistory.push({ role: "user", parts: [{ text: userText }] });
-
+                // Prepare the payload for the Gemini API call using the full chat history
                 const payload = { contents: chatHistory };
                 // PASTE YOUR API KEY HERE
-                const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8";
+                const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8"; // The API key should not be hardcoded for security
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
                 // Fetch the response from the API with exponential backoff for retries
@@ -177,6 +181,8 @@
 
                 if (botResponse) {
                     appendMessage('bot', botResponse);
+                    // Add the bot's response to the chat history
+                    chatHistory.push({ role: 'model', parts: [{ text: botResponse }] });
                 } else {
                     appendMessage('bot', 'Sorry, I couldn\'t generate a response. Please try again.');
                 }
