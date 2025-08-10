@@ -139,14 +139,19 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // The system prompt should only be provided with the first message to establish the persona
-                // For subsequent messages, only send the user's message
-                const payload = { contents: [{ role: 'system', parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }] }, ...chatHistory] };
-                
-                // IMPORTANT: You need to paste your API key here for the app to work.
-                // Replace the empty string with your key.
-                const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8";
+                // For a real app, you would use a backend to securely make this call.
+                // For this environment, we can use an empty string for the API key to
+                // allow the system to inject it for us.
+                const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                // Prepare the payload with the system prompt and the full chat history
+                const payload = {
+                    contents: [
+                        { role: 'system', parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }] },
+                        ...chatHistory
+                    ]
+                };
 
                 // Fetch the response from the API with exponential backoff for retries
                 let response;
@@ -219,6 +224,7 @@
     </script>
 </body>
 </html>
+
 
 
 
