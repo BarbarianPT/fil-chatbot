@@ -136,7 +136,7 @@
                 chatHistory.push({ role: "user", parts: [{ text: userText }] });
                 const payload = { contents: chatHistory };
                 // PASTE YOUR API KEY HERE
-                const apiKey = "AIzaSyCYDF9RInNpyeVxM8uNmApe-MrdFFTb4dU";
+                const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
                 // Fetch the response from the API with exponential backoff for retries
@@ -208,5 +208,6 @@
     </script>
 </body>
 </html>
+
 
 
