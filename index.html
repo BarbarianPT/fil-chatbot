@@ -82,8 +82,14 @@
         const sendButton = document.getElementById('send-button');
         const updateButton = document.getElementById('update-button');
         
-        // This array will hold the conversation history
-        const chatHistory = [];
+        // This array will hold the conversation history, including the system prompt
+        const chatHistory = [
+            // The system prompt is included here only once to set the persona
+            {
+                role: 'system',
+                parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }]
+            }
+        ];
 
         // Current version of the app. This could be fetched from a file in a real-world scenario.
         const currentVersion = '1.0.1';
@@ -145,13 +151,8 @@
                 const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-                // Prepare the payload with the system prompt and the full chat history
-                const payload = {
-                    contents: [
-                        { role: 'system', parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }] },
-                        ...chatHistory
-                    ]
-                };
+                // Prepare the payload with the full chat history
+                const payload = { contents: chatHistory };
 
                 // Fetch the response from the API with exponential backoff for retries
                 let response;
