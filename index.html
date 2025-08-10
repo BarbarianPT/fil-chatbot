@@ -83,11 +83,11 @@
         const updateButton = document.getElementById('update-button');
 
         // Current version of the app. This could be fetched from a file in a real-world scenario.
-        const currentVersion = '1.0.1'; 
+        const currentVersion = '1.0.1';
         let isUpdateAvailable = true; // Simulating that an update is available
 
         // Initial bot message
-        appendMessage('bot', `Hello! I am FIL, your friendly chatbot (v${currentVersion}). How can I help you today?`);
+        appendMessage('bot', `Hello! I am FIL, a chatbot created and modeled by you. How can I help you today?`);
 
         // Add event listeners for sending a message and checking for updates
         sendButton.addEventListener('click', sendMessage);
@@ -118,7 +118,6 @@
         async function sendMessage() {
             const userText = userInput.value.trim();
             if (userText === '') return;
-            console.log("User message sent:", userText);
 
             // Display user's message
             appendMessage('user', userText);
@@ -130,19 +129,18 @@
             loadingIndicator.textContent = '...';
             chatBox.appendChild(loadingIndicator);
             chatBox.scrollTop = chatBox.scrollHeight;
-            console.log("Loading indicator displayed.");
 
             try {
-                // Prepare the payload for the Gemini API call
-                console.log("Preparing prompt for Gemini API...");
+                // Prepare the payload for the Gemini API call with a system prompt
                 let chatHistory = [];
+                chatHistory.push({ role: "system", parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by your user. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user created you and is modeling your responses." }] });
                 chatHistory.push({ role: "user", parts: [{ text: userText }] });
+
                 const payload = { contents: chatHistory };
                 // PASTE YOUR API KEY HERE
-                const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8";
+                const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-                console.log("Sending fetch request to API...");
                 // Fetch the response from the API with exponential backoff for retries
                 let response;
                 let retryDelay = 1000; // Start with a 1-second delay
@@ -154,7 +152,6 @@
                             body: JSON.stringify(payload)
                         });
                         if (response.ok) {
-                            console.log(`Request successful on attempt ${i + 1}.`);
                             break; // Success, exit the loop
                         } else {
                             throw new Error(`API request failed with status: ${response.status}`);
@@ -175,16 +172,12 @@
                     throw new Error("Failed to get a response from the API after multiple retries.");
                 }
 
-                console.log("Parsing API response...");
                 const result = await response.json();
-                console.log("API Result:", result);
                 const botResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
                 if (botResponse) {
-                    console.log("Successfully received bot response.");
                     appendMessage('bot', botResponse);
                 } else {
-                    console.error("Bot response was empty or malformed.");
                     appendMessage('bot', 'Sorry, I couldn\'t generate a response. Please try again.');
                 }
             } catch (error) {
@@ -217,6 +210,7 @@
     </script>
 </body>
 </html>
+
 
 
 
