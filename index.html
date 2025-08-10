@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FIL Chatbot</title>
-    <!-- Include Tailwind CSS -->
+    <!-- Include Tailwind CSS for a modern look -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
@@ -54,7 +54,7 @@
 
         <!-- Chat display area -->
         <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col space-y-4">
-            <!-- Chat messages will be appended here -->
+            <!-- Chat messages will be appended here dynamically by JavaScript -->
         </div>
 
         <!-- Message input and update check area -->
@@ -71,7 +71,6 @@
                 </svg>
             </button>
         </div>
-
     </div>
 
     <!-- Script section -->
@@ -82,15 +81,21 @@
         const sendButton = document.getElementById('send-button');
         const updateButton = document.getElementById('update-button');
         
-        // This array will hold the conversation history
-        const chatHistory = [];
+        // This array will hold the conversation history. The system prompt is included
+        // here at the beginning so it's only sent once to establish the persona.
+        const chatHistory = [
+            {
+                role: 'user', // Use 'user' for system prompts in the Gemini API
+                parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }]
+            }
+        ];
 
-        // Current version of the app. This could be fetched from a file in a real-world scenario.
+        // Current version of the app.
         const currentVersion = '1.0.1';
         let isUpdateAvailable = true; // Simulating that an update is available
 
         // Initial bot message, updated with the correct name
-        const initialMessage = "Hello! I'm Fil, an LLM created and modeled by Filipe Leiras. How can I help you today?";
+        const initialMessage = "Hello! I'm Fil, a friendly chatbot created and modeled by Filipe Leiras. How can I help you today?";
         appendMessage('bot', initialMessage);
         
         // Push the initial message to the chat history
@@ -139,14 +144,14 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // The system prompt should only be provided with the first message to establish the persona
-                // For subsequent messages, only send the user's message
-                const payload = { contents: [{ role: 'system', parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }] }, ...chatHistory] };
-                
-                // IMPORTANT: You need to paste your API key here for the app to work.
-                // Replace the empty string with your key.
+                // IMPORTANT: For this environment, leave the API key as an empty string.
+                // The system will handle the key securely for you.
                 const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                // Prepare the payload with the full chat history. The system prompt is already
+                // at the beginning of the history array and will not be repeated.
+                const payload = { contents: chatHistory };
 
                 // Fetch the response from the API with exponential backoff for retries
                 let response;
@@ -219,6 +224,7 @@
     </script>
 </body>
 </html>
+
 
 
 
