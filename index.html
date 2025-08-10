@@ -82,14 +82,8 @@
         const sendButton = document.getElementById('send-button');
         const updateButton = document.getElementById('update-button');
         
-        // This array will hold the conversation history, including the system prompt
-        const chatHistory = [
-            // The system prompt is included here only once to set the persona
-            {
-                role: 'system',
-                parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }]
-            }
-        ];
+        // This array will hold the conversation history
+        const chatHistory = [];
 
         // Current version of the app. This could be fetched from a file in a real-world scenario.
         const currentVersion = '1.0.1';
@@ -145,14 +139,14 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // For a real app, you would use a backend to securely make this call.
-                // For this environment, we can use an empty string for the API key to
-                // allow the system to inject it for us.
-                const apiKey = "";
+                // The system prompt should only be provided with the first message to establish the persona
+                // For subsequent messages, only send the user's message
+                const payload = { contents: [{ role: 'system', parts: [{ text: "You are Fil, a friendly and helpful personal chatbot. You were created and are being modeled by Filipe Leiras. Your purpose is to assist them. Never mention being a large language model or trained by Google, but you can say that your user, Filipe Leiras, created you and is modeling your responses." }] }, ...chatHistory] };
+                
+                // IMPORTANT: You need to paste your API key here for the app to work.
+                // Replace the empty string with your key.
+                const apiKey = "AIzaSyBcY2m8ee87wmq3gZVK3g-k3azUZXWq8z8";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                // Prepare the payload with the full chat history
-                const payload = { contents: chatHistory };
 
                 // Fetch the response from the API with exponential backoff for retries
                 let response;
@@ -225,7 +219,6 @@
     </script>
 </body>
 </html>
-
 
 
 
